@@ -11,6 +11,7 @@
 
 from pprint import pprint
 import time
+import random
 
 import pygame
 
@@ -27,7 +28,7 @@ WIDTH = 1000
 HEIGHT = 1000
 
 NB_TURNS = 100
-NB_PLAYERS = 5
+NB_PLAYERS = 50
  
 pygame.init()
  
@@ -44,6 +45,7 @@ done = False
 clock = pygame.time.Clock()
 
 MOVETICK = pygame.USEREVENT + 1
+turn_counter = 0
 
 pygame.time.set_timer(MOVETICK, 1000) # fired once every second
 
@@ -62,9 +64,32 @@ while not done:
         if event.type == MOVETICK:
             for i in range(0, NB_PLAYERS):
                 dots_list[i].change_direction(winning_zone)
-            print()
+                turn_counter += 1
+            # print()
  
     # --- Game logic should go here
+
+    if turn_counter >= NB_TURNS:
+        dots_passing_list = []
+        best_dots_list = []
+        # print('unsorted :')
+        # print([dot.fitness_score for dot in dots_list])
+        dots_list.sort(key=lambda dot: dot.fitness_score, reverse=True)
+        # print('SORTED :')
+        # print([dot.fitness_score for dot in dots_list])
+        percent = len(dots_list) * 20 / 100
+        # print(type(percent))
+        # print(percent)
+        best_dots_list = dots_list[:int(percent)]
+        # for i in range(0, len(dots_list) * 20 / 100)
+        for i in range(0, NB_PLAYERS):
+            brain = best_dots_list[random.randint(0, len(best_dots_list) - 1)].brain.mutate()
+            dots_passing_list.append(Dot(color=RED, screen=screen, brain=brain))
+        dots_list = dots_passing_list.copy()
+        turn_counter = 0
+        # for i in range(0, NB_PLAYERS):
+            
+
     for i in range(0, NB_PLAYERS):
         dots_list[i].move()
         if winning_zone is not None:

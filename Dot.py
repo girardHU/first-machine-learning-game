@@ -6,10 +6,12 @@ from Brain import Brain
 
 class Dot:
 
-    def __init__(self, x=500, y=50, radius=5, color=(255, 255, 255), screen=None):
+    def __init__(self, x=500, y=50, radius=10, color=(255, 255, 255), brain=None, screen=None):
         self.x = x
         self.y = y
-        self.brain = Brain(nb_moves=100)
+        if brain is None:
+            brain = Brain(nb_moves=100)
+        self.brain = brain
         self.sprite = None
         self.current_move = 0
         self.max_move = 100
@@ -44,7 +46,8 @@ class Dot:
             self.brain.move_pool[self.current_move][axis] *= -1
 
     def is_winning(self, winning_zone):
-        self.won = self.sprite.colliderect(winning_zone)
+        if winning_zone is not None and self.sprite is not None:
+            self.won = self.sprite.colliderect(winning_zone)
 
     def compute_fitness(self, winning_zone=None):
         if winning_zone is not None:
