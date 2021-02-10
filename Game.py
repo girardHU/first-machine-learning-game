@@ -1,126 +1,115 @@
-"""
- Pygame base template for opening a window
- 
- Sample Python/Pygame Programs
- Simpson College Computer Science
- http://programarcadegames.com/
- http://simpson.edu/computer-science/
- 
- Explanation video: http://youtu.be/vRB_983kUMc
-"""
-
+import time, random, argparse
 from pprint import pprint
-import time
-import random
 
 import pygame
 
 from Dot import Dot
- 
-# Define some colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
+from Population import Population
 
-WIDTH = 1000
-HEIGHT = 1000
+class Game:
 
-NB_TURNS = 100
-NB_PLAYERS = 50
- 
-pygame.init()
- 
-# Set the width and height of the screen [width, height]
-size = (WIDTH, HEIGHT)
-screen = pygame.display.set_mode(size)
- 
-pygame.display.set_caption("My Game")
- 
-# Loop until the user clicks the close button.
-done = False
- 
-# Used to manage how fast the screen updates
-clock = pygame.time.Clock()
+    # Define some colors
+    BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
+    GREEN = (0, 255, 0)
+    RED = (255, 0, 0)
+    BLUE = (0, 0, 255)
 
-MOVETICK = pygame.USEREVENT + 1
-turn_counter = 0
+    def __init__(self, width=1000, height=1000, nb_players=50, nb_turns=5):
+        self.width = width
+        self.height = height
+        self.nb_players = nb_players
+        self.nb_turns = nb_turns
 
-pygame.time.set_timer(MOVETICK, 1000) # fired once every second
+        self.size = None
+        self.screen = None
+        self.done = None
+        self.clock = None
 
-dots_list = []
-winning_zone = None
+    def setup(self):
+        '''All the setup code'''
+        pygame.init()
+        pygame.font.init()
+        self.comicsansms_font = pygame.font.SysFont('Comic Sans MS', 30)
+        # Set the width and height of the screen [width, height]
+        self.size = (self.width, self.height)
+        self.screen = pygame.display.set_mode(self.size)
 
-for i in range(0, NB_PLAYERS):
-    dots_list.append(Dot(color=RED, screen=screen))
- 
-# -------- Main Program Loop -----------
-while not done:
-    # --- Main event loop
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            done = True
-        if event.type == MOVETICK:
-            for i in range(0, NB_PLAYERS):
-                dots_list[i].change_direction(winning_zone)
-                turn_counter += 1
-            # print()
- 
-    # --- Game logic should go here
+        pygame.display.set_caption("My Game")
+        # Loop until the user clicks the close button.
+        self.done = False
+        # Used to manage how fast the screen updates
+        self.clock = pygame.time.Clock()
 
-    if turn_counter >= NB_TURNS:
-        dots_passing_list = []
-        best_dots_list = []
-        # print('unsorted :')
-        # print([dot.fitness_score for dot in dots_list])
-        dots_list.sort(key=lambda dot: dot.fitness_score, reverse=True)
-        # print('SORTED :')
-        # print([dot.fitness_score for dot in dots_list])
-        percent = len(dots_list) * 20 / 100
-        # print(type(percent))
-        # print(percent)
-        best_dots_list = dots_list[:int(percent)]
-        # for i in range(0, len(dots_list) * 20 / 100)
-        for i in range(0, NB_PLAYERS):
-            brain = best_dots_list[random.randint(0, len(best_dots_list) - 1)].brain.mutate()
-            dots_passing_list.append(Dot(color=RED, screen=screen, brain=brain))
-        dots_list = dots_passing_list.copy()
-        turn_counter = 0
-        # for i in range(0, NB_PLAYERS):
-            
+        self.MOVETICK = pygame.USEREVENT + 1
+        self.turn_counter = 1
+        self.gen_counter = 1
 
-    for i in range(0, NB_PLAYERS):
-        dots_list[i].move()
-        if winning_zone is not None:
-            dots_list[i].is_winning(winning_zone)
+        pygame.time.set_timer(self.MOVETICK, 1000) # fired once every second
+        self.winning_area = pygame.draw.rect(self.screen, self.GREEN, (400, 950, 200, 50)) #TODO: find better way than drawing here
+        self.population = Population(winning_area=self.winning_area, nb_players=self.nb_players, screen=self.screen)
 
-    # Bounce the ball if needed
-    for i in range(0, NB_PLAYERS):
-        if dots_list[i].x > WIDTH - 5 or dots_list[i].x < 0:
-            dots_list[i].bounce(0)
-        if dots_list[i].y > HEIGHT - 5 or dots_list[i].y < 0:
-            dots_list[i].bounce(1)
+    def draw_game(self, turnsurface, gensurface):
+        '''All the drawing code'''
+        self.winning_area = pygame.draw.rect(self.screen, self.GREEN, (400, 950, 200, 50))
+        self.population.draw_players()
+        self.screen.blit(turnsurface, (1, 20))
+        self.screen.blit(gensurface, (1, 0))
 
-    # --- Screen-clearing code goes here
- 
-    # Here, we clear the screen to white. Don't put other drawing commands
-    # above this, or they will be erased with this command.
- 
-    # If you want a background image, replace this clear with blit'ing the
-    # background image.
-    screen.fill(WHITE)
- 
-    # --- Drawing code should go here
-    winning_zone = pygame.draw.rect(screen, GREEN, (400, 950, 200, 50))
-    for i in range(0, NB_PLAYERS):
-        dots_list[i].draw()
- 
-    # --- Go ahead and update the screen with what we've drawn.
-    pygame.display.flip()
- 
-    # --- Limit to 60 frames per second
-    clock.tick(60)
- 
-# Close the window and quit.
-pygame.quit()
+    def play(self):
+        '''Main Function, with main event loop'''
+        # -------- Main Program Loop -----------
+        while not self.done:
+            # --- Main event loop
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.done = True
+                if event.type == self.MOVETICK:
+                    self.population.change_players_direction()
+                    self.turn_counter += 1
+        
+            # --- Game logic should go here
+            if self.turn_counter >= self.nb_turns + 1:
+                self.population.next_generation()
+                self.turn_counter = 1
+                self.gen_counter += 1
+
+            turnsurface = self.comicsansms_font.render(f'Turn {self.turn_counter}/{self.nb_turns}', False, (0, 0, 0)) # surface used to display Turns
+            gensurface = self.comicsansms_font.render(f'Gen {self.gen_counter}', False, (0, 0, 0)) # surface used to display Generations
+
+            self.population.play_players_turn(self.width, self.height)
+
+            # --- Screen-clearing code goes here
+            # Here, we clear the screen to white. Don't put other drawing commands
+            # above this, or they will be erased with this command.
+        
+            # If you want a background image, replace this clear with blit'ing the
+            # background image.
+            self.screen.fill(self.WHITE)
+        
+            # --- Drawing code should go here
+            self.draw_game(turnsurface, gensurface)
+        
+            # --- Go ahead and update the screen with what we've drawn.
+            pygame.display.flip()
+        
+            # --- Limit to 60 frames per second
+            self.clock.tick(60)
+        
+        # Close the window and quit.
+        pygame.quit()
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description='Run the Machine Learning IA on the game.')
+    parser.add_argument('--width', type=int, nargs='?', help='The Width of the Screen')
+    parser.add_argument('--height', type=int, nargs='?', help='The Height of the Screen')
+
+    args = parser.parse_args()
+
+    WIDTH = args.width if args.width else 1000
+    HEIGHT = args.height if args.height else 1000
+
+    game = Game(WIDTH, HEIGHT)
+    game.setup()
+    game.play()

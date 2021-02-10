@@ -6,11 +6,9 @@ from Brain import Brain
 
 class Dot:
 
-    def __init__(self, x=500, y=50, radius=10, color=(255, 255, 255), brain=None, screen=None):
+    def __init__(self, brain, winning_area, x=500, y=50, radius=10, color=(255, 255, 255), screen=None):
         self.x = x
         self.y = y
-        if brain is None:
-            brain = Brain(nb_moves=100)
         self.brain = brain
         self.sprite = None
         self.current_move = 0
@@ -18,20 +16,18 @@ class Dot:
         self.radius = radius
         self.color = color
         self.screen = screen
+        self.winning_area = winning_area
 
         self.fitness_score = None
         self.won = False
         self.died = False
 
     def draw(self):
-        if self.screen:
-            # pygame.draw.ellipse(self.screen, self.color, (self.x, self.y, 10, 10))
+        if self.screen is not None:
             self.sprite = pygame.draw.ellipse(self.screen, self.color, (self.x, self.y, self.radius, self.radius))
-            return
-        raise ValueError('no screen passed to instance')
 
-    def change_direction(self, winning_zone):
-        self.compute_fitness(winning_zone)
+    def change_direction(self):
+        # self.score()
         if not self.won and not self.died:
             if self.current_move < self.max_move:
                 self.current_move += 1
@@ -45,13 +41,14 @@ class Dot:
         if not self.won and not self.died:
             self.brain.move_pool[self.current_move][axis] *= -1
 
-    def is_winning(self, winning_zone):
-        if winning_zone is not None and self.sprite is not None:
-            self.won = self.sprite.colliderect(winning_zone)
+    def check_win(self):
+        if self.winning_area is not None and self.sprite is not None:
+            self.won = self.sprite.colliderect(self.winning_area)
 
-    def compute_fitness(self, winning_zone=None):
-        if winning_zone is not None:
-            dist_to_win = math.hypot(self.sprite.centerx - winning_zone.centerx, self.sprite.centery - winning_zone.centery)
+    def score(self):
+        #TODO: check if at the end of each move, the fitness score is better
+        if self.sprite is not None:
+            dist_to_win = math.hypot(self.sprite.centerx - self.winning_area.centerx, self.sprite.centery - self.winning_area.centery)
             sqrt_nb_steps = self.current_move ** 3
             won_bonus = 0 if self.won else 1000
             fitness_score = 1 / (dist_to_win + sqrt_nb_steps + won_bonus)

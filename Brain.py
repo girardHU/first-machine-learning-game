@@ -6,31 +6,23 @@ class Brain:
 
     def __init__(self, nb_moves=100):
         self.move_pool = []
+        self.movement_speed = 5
+        self.movement_speed_vari = 5 * 10 / 100
         for i in range(0, nb_moves):
             self.nb_moves = nb_moves
-            self.move_pool.append(Vector2(random.uniform(-5., 5.), random.uniform(-5., 5.)))
+            random_x = random.uniform(-self.movement_speed, self.movement_speed)
+            random_y = random.uniform(-self.movement_speed, self.movement_speed)
+            self.move_pool.append(Vector2(random_x, random_y))
 
     def mutate(self):
         for i in range(0, self.nb_moves):
-            randome_value = random.randint(1, 20)
-            if randome_value == 5:
-                if self.move_pool[i].x < -1 or self.move_pool[i].x > 0:
-                    self.move_pool[i].x += 1
-                else:
-                    self.move_pool[i].x -= 1
-            elif randome_value == 10:
-                if self.move_pool[i].x > 1 or self.move_pool[i].x < 0:
-                    self.move_pool[i].x -= 1
-                else:
-                    self.move_pool[i].x += 1
-            elif randome_value == 15:
-                if self.move_pool[i].y < -1 or self.move_pool[i].y > 0:
-                    self.move_pool[i].y += 1
-                else:
-                    self.move_pool[i].y -= 1
-            elif randome_value == 20:
-                if self.move_pool[i].y > 1 or self.move_pool[i].y < 0:
-                    self.move_pool[i].y -= 1
-                else:
-                    self.move_pool[i].y += 1
+            randome_value = random.randint(1, 4)
+            if randome_value == 1:
+                self.move_pool[i].x += random.uniform(0, self.movement_speed_vari)
+            elif randome_value == 2:
+                self.move_pool[i].x -= random.uniform(0, self.movement_speed_vari)
+            elif randome_value == 3:
+                self.move_pool[i].y += random.uniform(0, self.movement_speed_vari)
+            elif randome_value == 4:
+                self.move_pool[i].y -= random.uniform(0, self.movement_speed_vari)
         return copy.deepcopy(self)
