@@ -5,5 +5,8 @@
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-python3 Game.py
+python3 Game.py --level=1
 ```
+
+### CLI Arguments
+`--level`*: From 0 to 1, choose level on which you want to run the simulation*

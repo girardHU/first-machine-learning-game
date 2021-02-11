@@ -26,3 +26,6 @@ class Brain:
             elif randome_value == 4:
                 self.move_pool[i].y -= random.uniform(0, self.movement_speed_vari)
         return copy.deepcopy(self)
+
+    def copy(self):
+        return copy.deepcopy(self)
