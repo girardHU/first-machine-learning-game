@@ -9,4 +9,6 @@ python3 Game.py --level=1
 ```
 
 ### CLI Arguments
-`--level`*: From 0 to 1, choose level on which you want to run the simulation*
+`--level`*: From 0 to 1, choose level on which you want to run the simulation*  
+`--nb_players`*: Defines the number of players*  
+`--nb_turns`*: Defines the number of turns for each generation*  
