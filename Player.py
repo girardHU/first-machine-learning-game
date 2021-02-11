@@ -5,6 +5,8 @@ import pygame
 from Brain import Brain
 from Move import Move
 
+from pprint import pprint
+
 class Player:
 
     def __init__(self, brain, winning_area, screen, x=500, y=50, radius=10, color=(255, 0, 0)):
@@ -38,8 +40,10 @@ class Player:
     def move(self): #TODO: add only one by one to better collision
         '''Move by the value corresponding to the current_move in the brain's movelist'''
         if not self.won and not self.died:
-            self.x += self.brain.move_pool[self.current_move]['vector'].x
-            self.y += self.brain.move_pool[self.current_move]['vector'].y
+            # pprint(vars(self.brain.move_pool[self.current_move]))
+            if self.brain.move_pool[self.current_move].vector is not None:
+                self.x += self.brain.move_pool[self.current_move].vector.x
+                self.y += self.brain.move_pool[self.current_move].vector.y
 
     def score_move(self, move_object):
         '''Score the current move in the brain object for better evolution'''
@@ -49,12 +53,12 @@ class Player:
     def bounce(self, axis):
         '''Change the direction in the given axis (x or y)'''
         if not self.won and not self.died:
-            self.brain.move_pool[self.current_move]['vector'][axis] *= -1
+            self.brain.move_pool[self.current_move].vector[axis] *= -1
 
     def check_win(self):
         '''update the won variable if there is a collision with the Winning Area'''
         if self.winning_area is not None and self.sprite is not None:
-            self.won = self.sprite.colliderect(self.winning_area)
+            self.won = True if self.sprite.colliderect(self.winning_area) else False
             return self.won
 
     def score(self):

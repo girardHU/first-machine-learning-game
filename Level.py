@@ -5,7 +5,7 @@ class Level:
     # COLOR = (139, 0, 139) # Obstacle Color
     COLOR = (65, 105, 225) # Obstacle Color
 
-    def __init__(self, screen, level_nb=0, color_obstacle=COLOR): # Blue
+    def __init__(self, screen, level_nb=0, color_obstacle=COLOR):
         self.level_nb = level_nb
         self.color_obstacle = color_obstacle
         self.screen = screen

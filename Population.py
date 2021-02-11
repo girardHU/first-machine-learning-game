@@ -10,7 +10,7 @@ class Population:
     PLAYER_COLOR = (220, 20, 60) # Player Color
     BEST_PLAYER_COLOR = (139, 0, 0) # Player Color
 
-    def __init__(self, screen, winning_area, nb_players, nb_turns, color=PLAYER_COLOR): # RED
+    def __init__(self, screen, winning_area, nb_players, nb_turns, color=PLAYER_COLOR):
         self.nb_players = nb_players
         self.players = []
         self.passing_number = int(nb_players * self.PASSING_PERCENT)
