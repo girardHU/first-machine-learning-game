@@ -53,14 +53,15 @@ class Game:
         self.population = Population(winning_area=self.winning_area, nb_players=self.nb_players, screen=self.screen)
         self.level = Level(level_nb=self.current_level, screen=self.screen)
 
-    def draw_game(self, turnsurface, gensurface, levelsurface):
+    def draw_game(self, nbplayerssurface, levelsurface, gensurface, turnsurface):
         '''All the drawing code'''
         self.level.draw_obstacles()
         self.winning_area.draw()
         self.population.draw_players()
-        self.screen.blit(gensurface, (1, 0))
-        self.screen.blit(turnsurface, (1, 20))
-        self.screen.blit(levelsurface, (1, 40))
+        self.screen.blit(nbplayerssurface, (1, 0))
+        self.screen.blit(levelsurface, (1, 20))
+        self.screen.blit(gensurface, (1, 40))
+        self.screen.blit(turnsurface, (1, 60))
 
     def play(self):
         '''Main Function, with main event loop'''
@@ -80,9 +81,10 @@ class Game:
                 self.turn_counter = 1
                 self.gen_counter += 1
 
-            turnsurface = self.comicsansms_font.render(f'Turn {self.turn_counter}/{self.nb_turns}', False, (0, 0, 0)) # surface used to display Turns
-            gensurface = self.comicsansms_font.render(f'Gen {self.gen_counter}', False, (0, 0, 0)) # surface used to display Generations
+            nbplayerssurface = self.comicsansms_font.render(f'NB Players {self.nb_players}', False, (0, 0, 0)) # surface used to display Generations
             levelsurface = self.comicsansms_font.render(f'Level {self.current_level}', False, (0, 0, 0)) # surface used to display Generations
+            gensurface = self.comicsansms_font.render(f'Gen {self.gen_counter}', False, (0, 0, 0)) # surface used to display Generations
+            turnsurface = self.comicsansms_font.render(f'Turn {self.turn_counter}/{self.nb_turns}', False, (0, 0, 0)) # surface used to display Turns
 
             if self.population.check_all_players_have_been_drawn():
                 self.population.play_players_turn(self.width, self.height, self.level)
@@ -96,7 +98,7 @@ class Game:
             self.screen.fill(self.WHITE)
         
             # --- Drawing code should go here
-            self.draw_game(turnsurface, gensurface, levelsurface)
+            self.draw_game(nbplayerssurface, levelsurface, gensurface, turnsurface)
         
             # --- Go ahead and update the screen with what we've drawn.
             pygame.display.flip()
@@ -111,6 +113,8 @@ if __name__ == '__main__':
     #TODO: add more argument support
     parser = argparse.ArgumentParser(description='Run the Machine Learning IA on the game.')
     parser.add_argument('--level', type=int, nargs='?', help='The Level to start with.')
+    parser.add_argument('--nb_players', type=int, nargs='?', help='The Number of players.')
+    parser.add_argument('--nb_turns', type=int, nargs='?', help='The Number of turns to play by generation.')
     # parser.add_argument('--width', type=int, nargs='?', help='The Width of the Screen')
     # parser.add_argument('--height', type=int, nargs='?', help='The Height of the Screen')
 
@@ -119,7 +123,9 @@ if __name__ == '__main__':
     # WIDTH = args.width if args.width else 1000
     # HEIGHT = args.height if args.height else 1000
     LEVEL = args.level if args.level else 0
+    NB_PLAYERS = args.nb_players if args.nb_players else 0
+    NB_TURNS = args.nb_turns if args.nb_turns else 0
 
-    game = Game(starting_level=LEVEL)
+    game = Game(starting_level=LEVEL, nb_players=NB_PLAYERS, nb_turns=NB_TURNS)
     game.setup()
     game.play()
