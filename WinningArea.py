@@ -10,5 +10,6 @@ class WinningArea:
         self. screen = screen
 
     def draw(self):
+        '''Draw the Winning Area'''
         if self.screen is not None:
             self.sprite = pygame.draw.rect(self.screen, self.color, self.rect)

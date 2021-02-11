@@ -3,7 +3,7 @@ from pprint import pprint
 
 import pygame
 
-from Dot import Dot
+from Player import Player
 from Population import Population
 from WinningArea import WinningArea
 from Level import Level
@@ -50,7 +50,7 @@ class Game:
 
         pygame.time.set_timer(self.MOVETICK, 1000) # fired once every second
         self.winning_area = WinningArea((400, 950, 200, 50), screen=self.screen)
-        self.population = Population(winning_area=self.winning_area, nb_players=self.nb_players, screen=self.screen)
+        self.population = Population(winning_area=self.winning_area, nb_players=self.nb_players, nb_turns=self.nb_turns, screen=self.screen)
         self.level = Level(level_nb=self.current_level, screen=self.screen)
 
     def draw_game(self, nbplayerssurface, levelsurface, gensurface, turnsurface):
