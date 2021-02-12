@@ -9,7 +9,7 @@ from pprint import pprint
 
 class Player:
 
-    def __init__(self, brain, winning_area, screen, x=500, y=50, radius=10, color=(255, 0, 0)):
+    def __init__(self, brain, winning_area, screen, x=500, y=50, radius=5, color=(255, 0, 0)):
         self.x = x
         self.y = y
         self.brain = brain
@@ -40,20 +40,21 @@ class Player:
     def move(self): #TODO: add only one by one to better collision
         '''Move by the value corresponding to the current_move in the brain's movelist'''
         if not self.won and not self.died:
-            # pprint(vars(self.brain.move_pool[self.current_move]))
-            if self.brain.move_pool[self.current_move].vector is not None:
-                self.x += self.brain.move_pool[self.current_move].vector.x
-                self.y += self.brain.move_pool[self.current_move].vector.y
+            # pprint(vars(self.brain.movepool[self.current_move]))
+            if self.brain.movepool[self.current_move].vector is not None:
+                self.x += self.brain.movepool[self.current_move].vector.x
+                self.y += self.brain.movepool[self.current_move].vector.y
 
     def score_move(self, move_object):
         '''Score the current move in the brain object for better evolution'''
         move_object.move_number = self.current_move
         self.brain.set_move_score(move_object)
 
-    def bounce(self, axis):
-        '''Change the direction in the given axis (x or y)'''
-        if not self.won and not self.died:
-            self.brain.move_pool[self.current_move].vector[axis] *= -1
+    #TODO: Fix bouncing -> need to keep brain.movepool as it was before
+    # def bounce(self, axis):
+    #     '''Change the direction in the given axis (x or y)'''
+    #     if not self.won and not self.died:
+    #         self.brain.movepool[self.current_move].vector[axis] *= -1
 
     def check_win(self):
         '''update the won variable if there is a collision with the Winning Area'''
@@ -65,13 +66,15 @@ class Player:
         #TODO: check if at the end of each move, the fitness score is better
         if self.sprite is not None:
             if self.won:
-                self.fitness_score = 2 / (self.current_move ** 2)
+                self.fitness_score = 20000 / (self.current_move ** 2)
             else:
                 dist_to_win = self.get_distance_to_goal()
                 if self.died:
-                    dist_to_win *= 2.5
-                self.fitness_score = 1 / dist_to_win
-        # print(self.fitness_score)
+                    dist_to_win *= 1.4 # May require some tweaking
+                    # dist_to_win *= 2.5 # May require some tweaking
+                self.fitness_score = 10000 / dist_to_win
+            # self.fitness_score += 1000
+            # print(self.fitness_score)
 
     # def score(self):
     #     '''IMPORTANT : function actually scoring the player'''

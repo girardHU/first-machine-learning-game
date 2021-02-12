@@ -1,16 +1,21 @@
 import random
 
+import time
+
 from Player import Player
 from Move import Move
 from Brain import Brain
+
+from pprint import pprint
 
 class Population:
 
     PASSING_PERCENT = 0.1 # Percentage of players which will pass their "genes"
     PLAYER_COLOR = (220, 20, 60) # Player Color
-    BEST_PLAYER_COLOR = (139, 0, 0) # Player Color
+    BEST_PLAYER_COLOR = (0, 255, 0) # Player Color
+    # BEST_PLAYER_COLOR = (139, 0, 0) # Player Color
 
-    def __init__(self, screen, winning_area, nb_players, nb_turns, color=PLAYER_COLOR):
+    def __init__(self, screen, winning_area, nb_players, nb_moves, player_radius=5, color=PLAYER_COLOR):
         self.nb_players = nb_players
         self.players = []
         self.passing_number = int(nb_players * self.PASSING_PERCENT)
@@ -21,7 +26,7 @@ class Population:
         self.winning_area = winning_area
 
         for i in range(0, self.nb_players):
-            self.players.append(Player(Brain(nb_moves=nb_turns), winning_area, color=self.players_color, screen=screen))
+            self.players.append(Player(Brain(nb_moves=nb_moves), winning_area, radius=player_radius, color=self.players_color, screen=screen))
 
     def change_players_direction(self):
         '''Function which changes all players directions'''
@@ -41,6 +46,7 @@ class Population:
                 brain = best_players[0].brain.mutate()
             passing_players.append(Player(brain=brain, winning_area=self.winning_area, color=self.players_color, screen=self.screen))
         passing_players.append(Player(brain=best_players[0].brain.copy(), winning_area=self.winning_area, color=self.BEST_PLAYER_COLOR, screen=self.screen)) # Create last Gen best player
+        print('best score: ', best_players[0].fitness_score)
         self.players = passing_players
 
     def play_players_turn(self, screen_width, screen_height, level):
@@ -57,11 +63,15 @@ class Population:
                         player.died = True
                         move.iskilling_move = True
                 if player.x > screen_width - 5 or player.x < 0:
-                    player.bounce(0)
-                    move.isbouncing_move = True
+                    player.died = True
+                    move.iskilling_move = True
+                    # player.bounce(0)
+                    # move.isbouncing_move = True
                 if player.y > screen_height - 5 or player.y < 0:
-                    player.bounce(1)
-                    move.isbouncing_move = True
+                    player.died = True
+                    move.iskilling_move = True
+                    # player.bounce(1)
+                    # move.isbouncing_move = True
                 move.iswinning_move = player.check_win()
                 player.score_move(move)
 
@@ -80,9 +90,13 @@ class Population:
     def check_all_players_won_or_died(self):
         '''Check if at least one player is still playing (not dead or winning)'''
         for player in self.players:
-            if player.died is False or player.won is False:
+            if player.died is False and player.won is False:
                 return False
         return True
+
+    def incr_nb_moves(self, step_nb_moves):
+        for player in self.players:
+            player.brain.add_moves(step_nb_moves)
 
     def _sort_players_by_fitness(self):
         '''sort players by their fitness score, in descending order'''
@@ -93,4 +107,4 @@ class Population:
         '''Score each player'''
         for player in self.players:
             player.score()
-        # print()
+        print()

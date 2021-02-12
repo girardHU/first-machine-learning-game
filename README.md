@@ -12,11 +12,21 @@ python3 Game.py --level=1
 ### CLI Arguments
 `--level`*: From 0 to 3, choose level on which you want to run the simulation*  
 `--nb_players`*: Defines the number of players*  
-`--nb_turns`*: Defines the number of turns for each generation*  
+`--nb_moves`*: Defines the number of turns for each generation*  
+`--step_nb_moves`*: The Number by which you want to increase the size of the movepool*  
+`--tickrate`*: The speed of the move tickrate (in milliseconds)*  
 
 
 ### TODOS
 Add a CLI argument to fasten the game (lower tick rate and increase Players's movement speed)
+Fix Bouncing to allow bouncing off walls (and obstacles maybe)
+Display only the best player
 
 ### FIXES
 Sometimes, best player seems to be broken
+Allow resizing of the screen (by setting relative sizes)
+When the tock rate is high, it freezes on the first ticks and dont play them
+Regroup loops on players (in Population) (may fix the problem above)
+
+STARTING_NB_MOVES = 5
+STEP_NB_MOVES = 5
