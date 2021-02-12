@@ -18,15 +18,17 @@ class Population:
     def __init__(self, screen, winning_area, nb_players, nb_moves, player_radius=5, color=PLAYER_COLOR):
         self.nb_players = nb_players
         self.players = []
+        self.player_radius = player_radius
         self.passing_number = int(nb_players * self.PASSING_PERCENT)
         if self.passing_number < 1:
             self.passing_number = 1
         self.players_color = color
         self.screen = screen
         self.winning_area = winning_area
+        self.last_gen_best_player = None
 
         for i in range(0, self.nb_players):
-            self.players.append(Player(Brain(nb_moves=nb_moves), winning_area, radius=player_radius, color=self.players_color, screen=screen))
+            self.players.append(Player(Brain(nb_moves=nb_moves), winning_area, radius=self.player_radius, color=self.players_color, screen=screen))
 
     def change_players_direction(self):
         '''Function which changes all players directions'''
@@ -36,16 +38,24 @@ class Population:
     def next_generation(self):
         '''Function which handle the generation swaping (n to n+1)'''
         passing_players = []
-        self._sort_players_by_fitness() # sort players by best fitness score
+        self._score_players()
+        self._sort_players_by_fitness_score() # sort players by best fitness score
+        self.last_gen_best_player = self.players[0]
         best_players = self.players[:self.passing_number]
+        # for i, move in enumerate(best_players[0].brain.movepool):
+        #     print(f'move {i + 1} x:', move.vector.x)
+        #     print(f'move {i + 1} y:', move.vector.x)
+        #     print()
+
         for i in range(0, self.nb_players - 1):
             ceil = len(best_players) - 1
+            # brain = best_players[0].brain.mutate()
             if ceil >= 1:
-                brain = best_players[random.randint(0, len(best_players) - 1)].brain.mutate()
+                brain = best_players[random.randint(0, ceil)].brain.mutate()
             else:
                 brain = best_players[0].brain.mutate()
-            passing_players.append(Player(brain=brain, winning_area=self.winning_area, color=self.players_color, screen=self.screen))
-        passing_players.append(Player(brain=best_players[0].brain.copy(), winning_area=self.winning_area, color=self.BEST_PLAYER_COLOR, screen=self.screen)) # Create last Gen best player
+            passing_players.append(Player(brain=brain, winning_area=self.winning_area, radius=self.player_radius, color=self.players_color, screen=self.screen))
+        passing_players.append(Player(brain=best_players[0].brain.copy(), winning_area=self.winning_area, radius=self.player_radius, color=self.BEST_PLAYER_COLOR, screen=self.screen)) # Create last Gen best player
         print('best score: ', best_players[0].fitness_score)
         self.players = passing_players
 
@@ -73,10 +83,14 @@ class Population:
                     # player.bounce(1)
                     # move.isbouncing_move = True
                 move.iswinning_move = player.check_win()
-                player.score_move(move)
+                move.move_number = player.current_move
+                player.brain.set_move_object(move)
 
     def draw_players(self):
         '''Draw each player by calling their draw method'''
+        if self.last_gen_best_player is not None:
+            self.last_gen_best_player.color=(200, 0, 200)
+            self.last_gen_best_player.draw()
         for player in self.players:
             player.draw()
 
@@ -98,10 +112,13 @@ class Population:
         for player in self.players:
             player.brain.add_moves(step_nb_moves)
 
-    def _sort_players_by_fitness(self):
+    def _sort_players_by_fitness_score(self):
         '''sort players by their fitness score, in descending order'''
-        self._score_players()
         self.players.sort(key=lambda player: player.fitness_score, reverse=True)
+        # print('sorted scores : ')
+        # for player in self.players:
+        #     print(player.fitness_score)
+        # print()
 
     def _score_players(self):
         '''Score each player'''

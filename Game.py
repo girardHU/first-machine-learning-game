@@ -128,11 +128,11 @@ if __name__ == '__main__':
     #TODO: add more argument support
     parser = argparse.ArgumentParser(description='Run the Machine Learning IA on the game.')
     parser.add_argument('--level', type=int, nargs='?', default=0, help='The Level to start with.')
-    parser.add_argument('--nb_players', type=int, nargs='?', default=50, help='The Number of players.')
-    parser.add_argument('--player_radius', type=int, nargs='?', default=5, help='The Radius of Players.')
-    parser.add_argument('--nb_moves', type=int, nargs='?', default=5, help='The Number of moves to play by generation at starts.')
-    parser.add_argument('--step_nb_moves', type=int, nargs='?', default=5, help='The Number by which you want to increase the size of the movepool.')
-    parser.add_argument('--tickrate', type=int, nargs='?', default=1000, help='The speed of the move tickrate (in milliseconds)')
+    parser.add_argument('--nb-players', type=int, nargs='?', default=50, help='The Number of players.')
+    parser.add_argument('--player-radius', type=int, nargs='?', default=5, help='The Radius of Players.')
+    parser.add_argument('--nb-moves', type=int, nargs='?', default=5, help='The Number of moves of the first generations.')
+    parser.add_argument('--step-nb-moves', type=int, nargs='?', default=5, help='The Number by which you want to increase the size of the movepool.')
+    parser.add_argument('--tickrate', type=int, nargs='?', default=1000, help='The rate of the move tick (in milliseconds)')
     # parser.add_argument('--width', type=int, nargs='?', help='The Width of the Screen')
     # parser.add_argument('--height', type=int, nargs='?', help='The Height of the Screen')
 
