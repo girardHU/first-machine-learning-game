@@ -28,8 +28,6 @@ class Game:
         self.player_radius = player_radius
         self.current_level = starting_level
 
-        self.hasincreased = False
-
         self.tickrate = tickrate
         self.size = None
         self.screen = None
@@ -52,8 +50,6 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.MOVETICK = pygame.USEREVENT + 1
-        self.turn_counter = 1
-        self.gen_counter = 1
 
         pygame.time.set_timer(self.MOVETICK, self.tickrate) # fired once every second by default
         self.winning_area = WinningArea((400, 950, 200, 50), screen=self.screen)
@@ -72,6 +68,11 @@ class Game:
 
     def play(self):
         '''Main Function, with main event loop'''
+
+        gen_counter = 1
+        turn_counter = 1
+        hasincreased = False
+
         # -------- Main Program Loop -----------
         while not self.done:
             # --- Main event loop
@@ -80,24 +81,24 @@ class Game:
                     self.done = True
                 if event.type == self.MOVETICK:
                     self.population.increment_players_current_move()
-                    self.turn_counter += 1
-        
-            # --- Game logic should go here
-            if self.turn_counter - 1 >= self.current_nb_moves or self.population.check_all_players_won_or_died():
-                self.population.next_generation()
-                self.turn_counter = 1
-                self.gen_counter += 1
-                self.hasincreased = False
+                    turn_counter += 1
 
-            if self.gen_counter > 1 and not self.hasincreased and self.gen_counter % self.gap_new_moves == 0:
+            # --- Game logic should go here
+            if turn_counter - 1 >= self.current_nb_moves or self.population.check_all_players_won_or_died():
+                self.population.next_generation()
+                turn_counter = 1
+                gen_counter += 1
+                hasincreased = False
+
+            if gen_counter > 1 and not hasincreased and gen_counter % self.gap_new_moves == 0:
                 self.population.incr_nb_moves(self.nb_new_moves)
                 self.current_nb_moves += self.nb_new_moves
-                self.hasincreased = True
+                hasincreased = True
 
             nbplayerssurface = self.comicsansms_font.render(f'NB Players {self.nb_players}', False, (0, 0, 0)) # surface used to display Generations
             levelsurface = self.comicsansms_font.render(f'Level {self.current_level}', False, (0, 0, 0)) # surface used to display Generations
-            gensurface = self.comicsansms_font.render(f'Gen {self.gen_counter}', False, (0, 0, 0)) # surface used to display Generations
-            turnsurface = self.comicsansms_font.render(f'Move {self.turn_counter}/{self.current_nb_moves}', False, (0, 0, 0)) # surface used to display Turns
+            gensurface = self.comicsansms_font.render(f'Gen {gen_counter}', False, (0, 0, 0)) # surface used to display Generations
+            turnsurface = self.comicsansms_font.render(f'Move {turn_counter}/{self.current_nb_moves}', False, (0, 0, 0)) # surface used to display Turns
 
             if self.population.check_all_players_have_been_drawn():
                 self.population.play_players_turn(self.width, self.height, self.level)

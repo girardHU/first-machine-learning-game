@@ -3,7 +3,6 @@ import math, random, copy
 import pygame
 
 from Brain import Brain
-from Utils import normalize_vector
 
 from pprint import pprint
 
@@ -42,9 +41,8 @@ class Player:
         if not self.won and not self.died:
             # pprint(vars(self.brain.movepool[self.current_move]))
             if self.brain.movepool[self.current_move] is not None:
-                new_x, new_y = normalize_vector((self.x + self.brain.movepool[self.current_move].x) - self.x, (self.y + self.brain.movepool[self.current_move].y) - self.y)
-                self.x += new_x * self.SPEED
-                self.y += new_y * self.SPEED
+                self.x += self.brain.movepool[self.current_move].x
+                self.y += self.brain.movepool[self.current_move].y
 
     #TODO: Fix bouncing -> need to keep brain.movepool as it was before
     # def bounce(self, axis):
@@ -72,7 +70,8 @@ class Player:
         '''IMPORTANT : function actually scoring the player'''
         if self.sprite is not None:
             if self.won:
-                self.fitness_score = 20000 / (self.current_move ** 2)
+                self.fitness_score = 100000 / (self.current_move ** 2)
+                # self.fitness_score = 20000 / (self.current_move ** 2)
             else:
                 dist_to_win = self.get_distance_to_goal()
                 if self.died:

@@ -20,13 +20,15 @@ python3 Game.py --level=1
 
 
 ### TODOS
-Add a CLI argument to fasten the game (lower tick rate and increase Players's movement speed)
-Fix Bouncing to allow bouncing off walls (and obstacles maybe)
-Display only the best player
-Create pre-thought CLI command for each level
+Add a CLI argument to fasten the game (lower tick rate and increase Players's movement speed)  
+Fix Bouncing to allow bouncing off walls (and obstacles maybe)  
+Display only the best player  
+Create a Gamemode where the game pass to the next level by itself (and maybe run each level with optimized ressources)  
+Create pre-thought CLI command for each level  
+Defin Brain's MAX_STEP and SPEED_VARY dynamically  
 
 ### FIXES
-Sometimes, best player seems to be broken
-Allow resizing of the screen (by setting relative sizes)
-When the nb of moves is high, it freezes on the first ones and does not play them
-Regroup loops on players (in Population) (may fix the problem above)
+Sometimes, best player seems to be broken  
+Allow resizing of the screen (by setting relative sizes)  
+When the nb of moves is high, it freezes on the first ones and does not play them  
+Regroup loops on players (in Population) (may fix the problem above)  

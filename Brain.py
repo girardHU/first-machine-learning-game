@@ -5,7 +5,7 @@ from pygame import Vector2
 class Brain:
 
     VARYING = 0.3 # 30%
-    MAX_STEP = 1.0 # has to be one (vector normalization)
+    MAX_STEP = 3.0 # has to be one (vector normalization)
     SPEED_VARY = MAX_STEP * VARYING
 
     def __init__(self, nb_moves):
@@ -21,12 +21,12 @@ class Brain:
         self.movepool[move_object.move_number] = move_object
 
     def create_random_vector(self):
-        '''Create a random pygame.Vector2 between (-1, -1) and (1, 1)'''
-        random_x = random.uniform(-1, 1)
-        random_y = random.uniform(-1, 1)
+        '''Create a random pygame.Vector2'''
+        random_x = random.uniform(-self.MAX_STEP, self.MAX_STEP)
+        random_y = random.uniform(-self.MAX_STEP, self.MAX_STEP)
         while random_x == 0 and random_y == 0:
-            random_x = random.uniform(-1, 1)
-            random_y = random.uniform(-1, 1)
+            random_x = random.uniform(-self.MAX_STEP, self.MAX_STEP)
+            random_y = random.uniform(-self.MAX_STEP, self.MAX_STEP)
         return Vector2(random_x, random_y)
 
     def add_moves(self, amount_to_add):
