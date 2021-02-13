@@ -17,15 +17,14 @@ class Game:
     RED = (255, 0, 0)
     BLUE = (0, 0, 255)
 
-    GAP_MOVE_INCREASE = 5 # the gap of generation between two movepool increase
-
-    def __init__(self, width=1000, height=1000, nb_players=50, nb_moves=5, step_nb_moves=5, player_radius=5, starting_level=0, tickrate=1000):
+    def __init__(self, width=1000, height=1000, nb_players=50, nb_moves=5, nb_new_moves=5, gap_new_moves=5, player_radius=5, starting_level=0, tickrate=1000):
         self.width = width
         self.height = height
         self.nb_players = nb_players
         self.starting_nb_moves = nb_moves
         self.current_nb_moves = nb_moves
-        self.step_nb_moves = step_nb_moves
+        self.nb_new_moves = nb_new_moves
+        self.gap_new_moves = gap_new_moves
         self.player_radius = player_radius
         self.current_level = starting_level
 
@@ -80,8 +79,7 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.done = True
                 if event.type == self.MOVETICK:
-                    self.population.change_players_direction()
-                    print("current counter : ", self.turn_counter)
+                    self.population.increment_players_current_move()
                     self.turn_counter += 1
         
             # --- Game logic should go here
@@ -91,9 +89,9 @@ class Game:
                 self.gen_counter += 1
                 self.hasincreased = False
 
-            if self.gen_counter > 1 and not self.hasincreased and self.gen_counter % self.GAP_MOVE_INCREASE == 0:
-                self.population.incr_nb_moves(self.step_nb_moves)
-                self.current_nb_moves += self.step_nb_moves
+            if self.gen_counter > 1 and not self.hasincreased and self.gen_counter % self.gap_new_moves == 0:
+                self.population.incr_nb_moves(self.nb_new_moves)
+                self.current_nb_moves += self.nb_new_moves
                 self.hasincreased = True
 
             nbplayerssurface = self.comicsansms_font.render(f'NB Players {self.nb_players}', False, (0, 0, 0)) # surface used to display Generations
@@ -131,7 +129,8 @@ if __name__ == '__main__':
     parser.add_argument('--nb-players', type=int, nargs='?', default=50, help='The Number of players.')
     parser.add_argument('--player-radius', type=int, nargs='?', default=5, help='The Radius of Players.')
     parser.add_argument('--nb-moves', type=int, nargs='?', default=5, help='The Number of moves of the first generations.')
-    parser.add_argument('--step-nb-moves', type=int, nargs='?', default=5, help='The Number by which you want to increase the size of the movepool.')
+    parser.add_argument('--nb-new-moves', type=int, nargs='?', default=5, help='The Number by which you want to increase the size of the movepool.')
+    parser.add_argument('--gap-new-moves', type=int, nargs='?', default=5, help='The Number of generation between two nb moves increases.')
     parser.add_argument('--tickrate', type=int, nargs='?', default=1000, help='The rate of the move tick (in milliseconds)')
     # parser.add_argument('--width', type=int, nargs='?', help='The Width of the Screen')
     # parser.add_argument('--height', type=int, nargs='?', help='The Height of the Screen')
@@ -143,10 +142,11 @@ if __name__ == '__main__':
     LEVEL = args.level
     NB_PLAYERS = args.nb_players
     NB_TURNS = args.nb_moves
-    STEP_NB_TURNS = args.step_nb_moves
+    NB_NEW_MOVES = args.nb_new_moves
+    GAP_NEW_MOVES = args.gap_new_moves
     PLAYER_RADIUS = args.player_radius
     TICKRATE = args.tickrate
 
-    game = Game(nb_players=NB_PLAYERS, nb_moves=NB_TURNS, step_nb_moves=STEP_NB_TURNS, player_radius=PLAYER_RADIUS, starting_level=LEVEL, tickrate=TICKRATE)
+    game = Game(nb_players=NB_PLAYERS, nb_moves=NB_TURNS, nb_new_moves=NB_NEW_MOVES, gap_new_moves=GAP_NEW_MOVES, player_radius=PLAYER_RADIUS, starting_level=LEVEL, tickrate=TICKRATE)
     game.setup()
     game.play()

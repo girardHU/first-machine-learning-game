@@ -3,7 +3,6 @@ import random
 import time
 
 from Player import Player
-from Move import Move
 from Brain import Brain
 
 from pprint import pprint
@@ -30,21 +29,21 @@ class Population:
         for i in range(0, self.nb_players):
             self.players.append(Player(Brain(nb_moves=nb_moves), winning_area, radius=self.player_radius, color=self.players_color, screen=screen))
 
-    def change_players_direction(self):
+    def increment_players_current_move(self):
         '''Function which changes all players directions'''
         for player in self.players:
-            player.change_direction()
+            player.increment_player_current_move()
 
     def next_generation(self):
         '''Function which handle the generation swaping (n to n+1)'''
         passing_players = []
         self._score_players()
-        self._sort_players_by_fitness_score() # sort players by best fitness score
+        self.players.sort(key=lambda player: player.fitness_score, reverse=True) # sort players by best fitness score
         self.last_gen_best_player = self.players[0]
         best_players = self.players[:self.passing_number]
         # for i, move in enumerate(best_players[0].brain.movepool):
-        #     print(f'move {i + 1} x:', move.vector.x)
-        #     print(f'move {i + 1} y:', move.vector.x)
+        #     print(f'move {i + 1} x:', move.x)
+        #     print(f'move {i + 1} y:', move.x)
         #     print()
 
         for i in range(0, self.nb_players - 1):
@@ -56,35 +55,24 @@ class Population:
                 brain = best_players[0].brain.mutate()
             passing_players.append(Player(brain=brain, winning_area=self.winning_area, radius=self.player_radius, color=self.players_color, screen=self.screen))
         passing_players.append(Player(brain=best_players[0].brain.copy(), winning_area=self.winning_area, radius=self.player_radius, color=self.BEST_PLAYER_COLOR, screen=self.screen)) # Create last Gen best player
-        print('best score: ', best_players[0].fitness_score)
+        # print('best score: ', best_players[0].fitness_score)
         self.players = passing_players
 
     def play_players_turn(self, screen_width, screen_height, level):
         '''Play each player turn (compute death and bouncing of edges)'''
         for player in self.players:
             if not player.died and not player.won:
-                move = Move(player.get_distance_to_goal())
                 player.move()
-                move.distance_to_win_final = player.get_distance_to_goal()
-                # print(player.sprite)
                 for obstacle in level.obstacles: # Die over obstacles
                     if player.sprite is not None and player.sprite.colliderect(obstacle):
-                        # print('TOUCHER')
                         player.died = True
-                        move.iskilling_move = True
                 if player.x > screen_width - 5 or player.x < 0:
                     player.died = True
-                    move.iskilling_move = True
                     # player.bounce(0)
-                    # move.isbouncing_move = True
                 if player.y > screen_height - 5 or player.y < 0:
                     player.died = True
-                    move.iskilling_move = True
                     # player.bounce(1)
-                    # move.isbouncing_move = True
-                move.iswinning_move = player.check_win()
-                move.move_number = player.current_move
-                player.brain.set_move_object(move)
+                player.check_win()
 
     def draw_players(self):
         '''Draw each player by calling their draw method'''
@@ -108,20 +96,12 @@ class Population:
                 return False
         return True
 
-    def incr_nb_moves(self, step_nb_moves):
+    def incr_nb_moves(self, amount_to_add):
         for player in self.players:
-            player.brain.add_moves(step_nb_moves)
-
-    def _sort_players_by_fitness_score(self):
-        '''sort players by their fitness score, in descending order'''
-        self.players.sort(key=lambda player: player.fitness_score, reverse=True)
-        # print('sorted scores : ')
-        # for player in self.players:
-        #     print(player.fitness_score)
-        # print()
+            player.brain.add_moves(amount_to_add)
 
     def _score_players(self):
         '''Score each player'''
         for player in self.players:
             player.score()
-        print()
+        # print()
